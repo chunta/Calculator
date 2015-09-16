@@ -8,7 +8,7 @@
 
 import Foundation
 
-class CalculatorBrain: Printable {
+class CalculatorBrain: CustomStringConvertible {
     private var opStack = [Op]()
     private var knownSymbols = [String:Op]()
     private var constantValues = [String:Double]()
@@ -18,7 +18,7 @@ class CalculatorBrain: Printable {
         get {
             var (result,ops) = ("", opStack)
             
-            do {
+            repeat {
                 var current: String?
                 (current,ops,_) = description(ops)
                 result = result == "" ? current! : "\(current!), \(result)"
@@ -49,7 +49,7 @@ class CalculatorBrain: Printable {
         }
     }
     
-    private enum Op: Printable {
+    private enum Op: CustomStringConvertible {
         case Operand(Double)
         case Variable(String)
         case Constant(String)
@@ -160,7 +160,7 @@ class CalculatorBrain: Printable {
     
     func evaluate() -> Double? {
         let (result, remainder)  = evaluate(opStack)
-        println("\(opStack) = \(result) with remainder \(remainder) left over" )
+        print("\(opStack) = \(result) with remainder \(remainder) left over" )
         
         return result
     }
@@ -193,7 +193,6 @@ class CalculatorBrain: Printable {
                         return ("\(operand2)\(symbol)\(operand1)", op2Evaluation.remainingOps, op.precedence)
                     }
                 }
-            default: break
             }
         }
         return ("?", ops, Int.max)

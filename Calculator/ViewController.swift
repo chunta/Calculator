@@ -49,11 +49,11 @@ class ViewController: UIViewController {
     }
     
     @IBAction func backspace() {
-        if count(display.text!) > 0 {
-            display.text = dropLast(display.text!)
+        if (display.text!).characters.count > 0 {
+            display.text = String((display.text!).characters.dropLast())
         }
         
-        if count(display.text!) == 0 {
+        if (display.text!).characters.count == 0 {
             display.text = "0"
             middleOfTyping = false
         }
