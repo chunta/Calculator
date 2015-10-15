@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class CalculatorViewController: UIViewController {
     @IBOutlet weak var display: UILabel!
     @IBOutlet weak var history: UILabel!
     
@@ -119,5 +119,29 @@ class ViewController: UIViewController {
         if let evaluation = brain.evaluate() {
             display.text = "\(evaluation)"
         }
+    }
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        var destination = segue.destinationViewController as UIViewController
+        if let navCon = destination as? UINavigationController, visibleVC = navCon.visibleViewController {
+            destination = visibleVC
+        }
+        
+        if let graphVC = destination as? GraphViewController {
+            if let identifier = segue.identifier {
+                switch identifier {
+                    case "show graph":
+                        print("before passing: \(brain.program)")
+                        graphVC.title = brain.description == "" ? "Graph" : brain.description.componentsSeparatedByString(",").last
+                        graphVC.program = brain.program
+                default: break
+                }
+            }
+        }
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(true)
+        print("after coming back from graph: \(brain.program)")
     }
 }

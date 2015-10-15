@@ -41,7 +41,9 @@ class CalculatorBrain: CustomStringConvertible {
                     if let op = knownSymbols[opSymbol] {
                         newOpStack.append(op)
                     } else if let operand = NSNumberFormatter().numberFromString(opSymbol)?.doubleValue {
-                        newOpStack.append(Op.Operand(operand))
+                        newOpStack.append(.Operand(operand))
+                    } else {
+                        newOpStack.append(.Variable(opSymbol))
                     }
                 }
                 opStack = newOpStack
@@ -160,7 +162,7 @@ class CalculatorBrain: CustomStringConvertible {
     
     func evaluate() -> Double? {
         let (result, remainder)  = evaluate(opStack)
-        print("\(opStack) = \(result) with remainder \(remainder) left over" )
+//        print("\(opStack) = \(result) with remainder \(remainder) left over" )
         
         return result
     }
@@ -195,6 +197,6 @@ class CalculatorBrain: CustomStringConvertible {
                 }
             }
         }
-        return ("?", ops, Int.max)
+        return ("", ops, Int.max)
     }
 }
