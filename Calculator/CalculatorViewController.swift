@@ -131,7 +131,6 @@ class CalculatorViewController: UIViewController {
             if let identifier = segue.identifier {
                 switch identifier {
                     case "show graph":
-                        print("before passing: \(brain.program)")
                         graphVC.title = brain.description == "" ? "Graph" : brain.description.componentsSeparatedByString(",").last
                         graphVC.program = brain.program
                 default: break
@@ -142,6 +141,5 @@ class CalculatorViewController: UIViewController {
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(true)
-        print("after coming back from graph: \(brain.program)")
     }
 }

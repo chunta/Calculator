@@ -2,6 +2,7 @@
 A simple postfixed calculator built as a project given from the Standford iOS Development Course.
 
 ![Image of App](Screenshots/empty.png)
+![Image of Graph](Screenshots/graph.png)
 
 # Topics Learned From The Assignment
 - Optionals

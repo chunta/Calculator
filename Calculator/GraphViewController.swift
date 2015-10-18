@@ -12,6 +12,11 @@ class GraphViewController: UIViewController, GraphViewDataSource {
     @IBOutlet weak var graphView: GraphView! {
         didSet {
             graphView.dataSource = self
+            graphView.addGestureRecognizer(UIPinchGestureRecognizer(target: graphView, action: "zoom:"))
+            graphView.addGestureRecognizer(UIPanGestureRecognizer(target: graphView, action: "move:"))
+            let gesture = UITapGestureRecognizer(target: graphView, action: "center:")
+            gesture.numberOfTapsRequired = 2
+            graphView.addGestureRecognizer(gesture)
         }
     }
     
@@ -32,10 +37,5 @@ class GraphViewController: UIViewController, GraphViewDataSource {
             return CGFloat(y)
         }
         return nil
-    }
-    
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(true)
-        print("in graphVC: \(program)")
     }
 }

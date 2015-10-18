@@ -17,8 +17,26 @@ class GraphView: UIView {
     @IBInspectable
     var scale: CGFloat = 1.0 { didSet { setNeedsDisplay() } } // points per unit
     var origin: CGPoint {
-        return convertPoint(center, fromView: superview)
+        get {
+            var origin = originRelativeToCenter
+            if geometryReady {
+                origin.x += center.x
+                origin.y += center.y
+            }
+            return origin
+        }
+        set {
+            var origin = newValue
+            if geometryReady {
+                origin.x -= center.x
+                origin.y -= center.y
+            }
+            originRelativeToCenter = origin
+        }
     }
+    
+    private var geometryReady = false
+    private var originRelativeToCenter: CGPoint = CGPoint() { didSet { setNeedsDisplay() } }
     
     var lineWidth: CGFloat = 1.0 { didSet { setNeedsDisplay() } }
     var color: UIColor = UIColor.orangeColor() { didSet { setNeedsDisplay() } }
@@ -26,6 +44,10 @@ class GraphView: UIView {
     weak var dataSource: GraphViewDataSource?
     
     override func drawRect(rect: CGRect) {
+        if !geometryReady && originRelativeToCenter != CGPointZero {
+            geometryReady = true
+        }
+        
         AxesDrawer(color: color, contentScaleFactor: contentScaleFactor).drawAxesInRect(bounds, origin: origin, pointsPerUnit: scale)
         
         color.set()
@@ -59,5 +81,68 @@ class GraphView: UIView {
             }
         }
         path.stroke()
+    }
+    
+    var snapshot: UIView?
+    
+    func zoom(gesture: UIPinchGestureRecognizer) {
+        switch gesture.state {
+        case .Began:
+            // freezes the view as it is
+            snapshot = self.snapshotViewAfterScreenUpdates(false)
+            // make it transparent
+            snapshot?.alpha = 0.8
+            self.addSubview(snapshot!)
+        case .Changed:
+            let touch = gesture.locationInView(self)
+            snapshot!.frame.size.height *= gesture.scale
+            snapshot!.frame.size.width *= gesture.scale
+            snapshot!.frame.origin.x = snapshot!.frame.origin.x * gesture.scale + (1-gesture.scale) * touch.x
+            snapshot!.frame.origin.y = snapshot!.frame.origin.y * gesture.scale + (1-gesture.scale) * touch.y
+            
+            // reset the scale
+            gesture.scale = 1.0
+        case .Ended:
+            let changedScale = snapshot!.frame.height / self.frame.height
+            scale *= changedScale
+            origin.x = origin.x * changedScale + snapshot!.frame.origin.x
+            origin.y = origin.y * changedScale + snapshot!.frame.origin.y
+            
+            snapshot!.removeFromSuperview()
+            snapshot = nil
+        default: break
+        }
+    }
+    
+    func move(gesture: UIPanGestureRecognizer) {
+        switch gesture.state {
+        case .Began:
+            snapshot = snapshotViewAfterScreenUpdates(false)
+            snapshot!.alpha = 0.8
+            
+            self.addSubview(snapshot!)
+        case .Changed:
+            let translation = gesture.translationInView(self)
+            snapshot!.frame.origin.x += translation.x
+            snapshot!.frame.origin.y += translation.y
+            
+            // reset it back to point zero in it's current view
+            gesture.setTranslation(CGPointZero, inView: self)
+        case .Ended:
+            origin.x += snapshot!.frame.origin.x
+            origin.y += snapshot!.frame.origin.y
+            
+            snapshot!.removeFromSuperview()
+            snapshot = nil
+        default: break
+        }
+    }
+    
+    func center(gesture: UITapGestureRecognizer) {
+        switch gesture.state {
+        case .Ended:
+            origin = gesture.locationInView(self)
+        default: break
+        }
     }
 }

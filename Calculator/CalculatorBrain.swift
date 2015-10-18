@@ -162,7 +162,7 @@ class CalculatorBrain: CustomStringConvertible {
     
     func evaluate() -> Double? {
         let (result, remainder)  = evaluate(opStack)
-//        print("\(opStack) = \(result) with remainder \(remainder) left over" )
+        print("\(opStack) = \(result) with remainder \(remainder) left over" )
         
         return result
     }
